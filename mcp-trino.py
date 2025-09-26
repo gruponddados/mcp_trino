@@ -1,7 +1,6 @@
 # mcp-trino.py — PoC MCP server for Trino (HTTP :8086)
 # Deps: pip install mcp trino
 
-import asyncio
 import logging
 import os
 import sys
@@ -18,7 +17,7 @@ mcp = FastMCP("trino-poc")
 
 # Defaults for your PoC
 _DEFAULTS = {
-    "HOST": "10.34.80.28",
+    "HOST": "172.22.0.146",
     "PORT": 8086,          # your port
     "USER": "trino",
     "CATALOG": "iceberg",
@@ -255,51 +254,6 @@ def trino_columns(table: str, catalog: Optional[str] = None, schema: Optional[st
     finally:
         try: conn.close()
         except: pass
-
-# @mcp.tool(description="Build and run a SELECT using structured parts (read-only).")
-# def trino_select(
-#     select: list[str],                 # e.g. ["advertiser_id", "sum(spend) as total_spend"]
-#     from_table: str,                   # e.g. "fato_investimento_mensal"
-#     where: Optional[str] = None,       # e.g. "ano = 2025 AND canal = 'TV'"
-#     group_by: Optional[list[str]] = None,
-#     order_by: Optional[str] = None,    # e.g. "total_spend DESC"
-#     limit: int = 100,
-#     catalog: Optional[str] = None,
-#     schema: Optional[str] = None,
-# ) -> dict:
-#     cat = catalog or _get_env("CATALOG", _DEFAULTS["CATALOG"])
-#     sch = schema  or _get_env("SCHEMA",  _DEFAULTS["SCHEMA"])
-
-#     if not _id_ok(from_table):
-#         return {"error": "Invalid table identifier"}
-#     if limit <= 0:
-#         limit = 100
-
-#     sel = ", ".join(select) if select else "*"
-#     sql = f"SELECT {sel} FROM {cat}.{sch}.{from_table}"
-#     if where:
-#         sql += f" WHERE {where}"
-#     if group_by:
-#         sql += " GROUP BY " + ", ".join(group_by)
-#     if order_by:
-#         sql += f" ORDER BY {order_by}"
-#     sql += f" LIMIT {int(limit)}"
-
-#     _ensure_readonly(sql)
-#     try:
-#         conn = _get_trino_conn(catalog_override=cat, schema_override=sch)
-#         cur = conn.cursor()
-#         cur.execute(sql)
-#         rows = cur.fetchall() or []
-#         cols = [d[0] for d in cur.description or []]
-#         data = [dict(zip(cols, r)) for r in rows]
-#         return {"sql": sql, "columns": cols, "rows": data, "rowcount": len(data)}
-#     except Exception as e:
-#         return {"error": str(e), "sql": sql}
-#     finally:
-#         try: conn.close()
-#         except: pass
-
 
 if __name__ == "__main__":
     mcp.run(transport="stdio")
