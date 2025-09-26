@@ -114,18 +114,6 @@ def trino_describe(table: str, catalog: str | None = None, schema: str | None = 
         try: conn.close()
         except: pass
 
-import re
-
-_NAME_RE = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
-
-def _id_ok(name: str) -> bool:
-    return bool(_NAME_RE.match(name))
-
-def _q(v):
-    # very small PoC quoter: numbers pass through, strings get single-quoted
-    return v if isinstance(v, (int, float)) else "'" + str(v).replace("'", "''") + "'"
-
-
 @mcp.tool(description="Run a read-only SQL query (SELECT/WITH/SHOW/DESCRIBE/EXPLAIN). Optionally enforce a LIMIT and a timeout.")
 def trino_query(
     sql: str,
